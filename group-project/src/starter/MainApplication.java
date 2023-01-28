@@ -16,6 +16,7 @@ public class MainApplication extends GraphicsApplication {
 	private GameOver gameOver;
 	private StartMenu start;
 	private Stage stage;
+	private Scoreboard scoreboard;
 
 	public void init() {
 		setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -27,6 +28,7 @@ public class MainApplication extends GraphicsApplication {
 		gameOver= new GameOver(this);
 		start= new StartMenu(this);
 		stage = new Stage(this);
+		scoreboard = new Scoreboard(this);
 		switchToMenu();
 	}
 	
