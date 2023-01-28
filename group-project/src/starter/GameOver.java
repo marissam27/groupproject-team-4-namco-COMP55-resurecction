@@ -52,8 +52,8 @@ public class GameOver extends GraphicsPane {
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 			program.setScore(0);
-			program.switchToMenu();
-			//switch to scores screen when it's made
+			program.switchToScoreboard();
+			//switch to scoreboard screen after game over screen
 		}
 	}
 }

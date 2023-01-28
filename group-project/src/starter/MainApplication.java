@@ -52,6 +52,10 @@ public class MainApplication extends GraphicsApplication {
 		switchToScreen(stage);
 	}
 	
+	public void switchToScoreboard() {
+		switchToScreen(scoreboard);
+	}
+	
 	public int getScore() {
 		return finalScore;
 	}

@@ -11,7 +11,7 @@ public class StartMenu extends GraphicsPane implements MouseListener{
     private MainApplication program;
 	
 	private GLabel title;
-    private GButton start, credits, exit;
+    private GButton start, credits, exit, scoreboard;
 
     StartMenu(MainApplication program) {
         this.program=program;
@@ -22,8 +22,9 @@ public class StartMenu extends GraphicsPane implements MouseListener{
         title.setLocation(220, 125);
         
         start = new GButton("Start",270, 200, 200, 50);
-        credits = new GButton("Credits", 270, 300, 200, 50);
-        exit = new GButton("Exit", 270, 400, 200, 50);
+        scoreboard = new GButton("Scoreboard",270, 300, 200, 50);
+        credits = new GButton("Credits", 270, 400, 200, 50);
+        exit = new GButton("Exit", 270, 500, 200, 50);
     }
     
     @Override
@@ -31,6 +32,9 @@ public class StartMenu extends GraphicsPane implements MouseListener{
     	if(start.contains(e.getX(), e.getY())) {
            program.switchToGraphics();
         }
+    	if(scoreboard.contains(e.getX(), e.getY())) {
+    		program.switchToScoreboard();
+    	}
         if(credits.contains(e.getX(), e.getY())) {
         	program.switchToCredits();
         }
@@ -44,6 +48,7 @@ public class StartMenu extends GraphicsPane implements MouseListener{
 		program.setBackground(Color.BLACK);
 		program.add(title);
 		program.add(start);
+		program.add(scoreboard);
 		program.add(credits);
 		program.add(exit);
 	}
