@@ -11,7 +11,7 @@ public class GameOver extends GraphicsPane {
 	public static final int GO_X = 800/3;
 	public static final int GO_Y = 600/2;
 	
-	private GLabel gameOver, enter, score,finalScore;
+	private GLabel gameOver, enter, score, finalScore;
 	
 	public GameOver(MainApplication program) {
 		this.program=program;
@@ -51,8 +51,9 @@ public class GameOver extends GraphicsPane {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
-			program.setScore(0);
-			program.switchToScoreboard();
+			//program.setScore(0);
+			program.switchToMenu();
+			//program.switchToScoreboard();
 			//switch to scoreboard screen after game over screen
 		}
 	}
