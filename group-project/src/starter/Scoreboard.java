@@ -20,11 +20,11 @@ public class Scoreboard extends GraphicsPane {
 	
 	private ArrayList<Pair<String, String>> top10scores = new ArrayList<Pair<String, String>>();
 	private String filename = new String("TopScores.txt");
-	private Integer newScoreSpot;
-	private Boolean compared;
+	private Integer newScoreSpot; //holds index where new score was added
+	private Boolean compared; //indicates if new score has been compared or not
 	
 	//Methods
-	//Create Scoreboard screen
+	//Create Scoreboard screen and initialize GLabels
 	public Scoreboard(MainApplication program){
 		this.program=program;
 		
@@ -87,60 +87,52 @@ public class Scoreboard extends GraphicsPane {
 		pressEscape.setFont(new Font(font,Font.PLAIN, 25));
 	}
 	
+	//Shows everything on screen
 	@Override
 	public void showContents() {
 		program.setBackground(Color.black);
 		program.add(Highscore);
 		
-		changeColor(score1,0);
 		program.add(score1);
-		
-		changeColor(score2,1);
 		program.add(score2);
-		
-		changeColor(score3,2);
 		program.add(score3);
-		
-		changeColor(score4,3);
 		program.add(score4);
-		
-		changeColor(score5,4);
 		program.add(score5);
-		
-		changeColor(score6,5);
 		program.add(score6);
-		
-		changeColor(score7,6);
 		program.add(score7);
-		
-		changeColor(score8,7);
 		program.add(score8);
-		
-		changeColor(score9,8);
 		program.add(score9);
-		
-		changeColor(score10,9);
 		program.add(score10);
-		
-		program.add(pressEscape);
 		
 		if(compared.booleanValue() == false && program.getScore() != 0) {
 			compareScores(program.getScore());
 		}
+		if(getName.isVisible() == false) {
+			program.add(pressEscape); //only show if user name is not asked
+		}
 	}
-
+	
+	//Hides everything on screen, saves scores, and resets variables that need it
 	@Override
 	public void hideContents() {
-		showContents();
+		changeLabelColor(newScoreSpot); //resets label color to unhighlight new score
 		compared = new Boolean(false);
 		newScoreSpot = new Integer(-1);
 		finalName.setLabel("");
+		try {
+			saveScores();
+		} catch (IOException e1) {
+			System.out.print("Error when saving data");
+			e1.printStackTrace();
+		}
 		program.removeAll();
 	}
 	
+	//Takes in keys pressed by user
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			//leave scoreboard screen to main menu
 			program.setScore(0);
 			program.switchToMenu();
 		}
@@ -155,13 +147,13 @@ public class Scoreboard extends GraphicsPane {
 			if(label.getColor() == Color.cyan) {
 				label.setColor(Color.white);
 			}
-			else {
+			else{
 				label.setColor(Color.cyan);
 			}
 		}
 	}
 	
-	//change all score labels when new score is added
+	//change all score labels when new score is added and refreshes screen
 	private void changeAllLabels() {
 		score1.setLabel("1 "+top10scores.get(0).getKey()+" "+top10scores.get(0).getValue());
 		score2.setLabel("2 "+top10scores.get(1).getKey()+" "+top10scores.get(1).getValue());
@@ -173,8 +165,50 @@ public class Scoreboard extends GraphicsPane {
 		score8.setLabel(" 8 "+top10scores.get(7).getKey()+" "+top10scores.get(7).getValue());
 		score9.setLabel(" 9 "+top10scores.get(8).getKey()+" "+top10scores.get(8).getValue());
 		score10.setLabel("10 "+top10scores.get(9).getKey()+" "+top10scores.get(9).getValue());
+		
+		showContents();
 	}
 	
+	//Calls changeColor() for each score label, but only uses the call where new score is
+	private void changeLabelColor(int spot) {
+		switch (spot) {
+		case 0:
+			changeColor(score1,spot);
+			break;
+		case 1:
+			changeColor(score2,spot);
+			break;
+		case 2:
+			changeColor(score3,spot);
+			break;
+		case 3:
+			changeColor(score4,spot);
+			break;
+		case 4:
+			changeColor(score5,spot);
+			break;
+		case 5:
+			changeColor(score6,spot);
+			break;
+		case 6:
+			changeColor(score7,spot);
+			break;
+		case 7:
+			changeColor(score8,spot);
+			break;
+		case 8:
+			changeColor(score9,spot);
+			break;
+		case 9:
+			changeColor(score10,spot);
+			break;
+		default:
+			break;
+		}
+		
+	}
+	
+	//Takes in keys pressed when user types name
 	private void getUserInput(KeyEvent key) {
 		switch(key.getKeyCode()) {
 		case KeyEvent.VK_A:
@@ -214,26 +248,30 @@ public class Scoreboard extends GraphicsPane {
 		if(finalName.getLabel().length() == 3) {
 			program.remove(finalName);
 			
-			//add name to new score spot
+			//add name to new score spot by replacing said spot
 			String tempScore = top10scores.get(newScoreSpot).getValue();
 			top10scores.add(newScoreSpot, new Pair<>(finalName.getLabel(),tempScore));
 			top10scores.remove(newScoreSpot+1);	
 			
 			changeAllLabels();
+			
 			program.remove(finalName);
 			program.remove(getName);
 			program.add(pressEscape);
-			showContents();
 		}
 	}
 	
-	//Initialize arrayList with default values
+	//Initialize private variables that need to be set and loads scores when program first opens
 	public void initializeScoreboard() {
-		for(int i=0;i<10;i++) {
-			top10scores.add(new Pair<>("---","000000"));
-		}
 		compared = new Boolean(false);
 		newScoreSpot = new Integer(-1);
+		
+		try {
+			loadScores();
+		} catch (IOException e) {
+			System.out.print("Error when loading scores");
+			e.printStackTrace();
+		}
 	}
 	
 	//Compare new score to top 10 scores to see if new score will be added to top 10
@@ -241,16 +279,16 @@ public class Scoreboard extends GraphicsPane {
 		for(int i=0;i<10;i++) {
 			if(newScore >= Integer.parseInt(top10scores.get(i).getValue())) {
 				askUser();
-				newScoreSpot = new Integer(i);
-				top10scores.add(i, new Pair<>("---", String.valueOf(newScore)));
-				changeAllLabels();
+				newScoreSpot = i; //set newScore spot to current index
+				top10scores.add(newScoreSpot, new Pair<>("---", String.valueOf(newScore)));
+				changeLabelColor(newScoreSpot);
 				top10scores.remove(10);
-				newScoreSpot = i;
-				program.setScore(0);
+				program.setScore(0); //reset user score from last round played to 0
 				break;
 			}
 		}
 		compared = new Boolean(true);
+		changeAllLabels();//shows where user's new score is
 	}
 	
 	//Asks user for name to use on scoreboard
@@ -259,11 +297,14 @@ public class Scoreboard extends GraphicsPane {
 		program.add(getName);
 	}
 	
-	//Saves top 10 scores(arrayList data)
-	public void saveScores() throws IOException {
-		clearFile();
-		
+	//Saves top 10 scores in arrayList to file
+	public void saveScores() throws IOException {		
 		PrintWriter out = new PrintWriter(filename);
+		
+		//checks if there is an extra score on list and removes it
+		if(top10scores.size() == 11) {
+			top10scores.remove(10);
+		}
 		
 		for(Pair<String, String> score : top10scores) {
 			out.println(score.getKey()+" "+score.getValue());
@@ -271,38 +312,31 @@ public class Scoreboard extends GraphicsPane {
 		out.close();
 	}
 	
-	//Loads top 10 scores to arrayList
+	//Loads top 10 scores to arrayList from file
 	public void loadScores() throws IOException {
-		Scanner scan = new Scanner(filename);
+		FileReader fr = new FileReader(filename);
 		String name = new String("");
 		String score = new String("");
-		while(scan.hasNextLine()) {
-    		String line= scan.next();
-    		for(int i=0; i<line.length() ;i++) {
-    			if(Character.isWhitespace(line.charAt(i))) {
-    				
-    				//checks rest of line from file for score and then adds name and score to arrayList
-    				for(int j=i; j<line.length() ;j++) {
-    					if(Character.isWhitespace(line.charAt(i))) {
-    						top10scores.add(new Pair<>(name, score));
-        				}
-    					score += line.charAt(j);
-    				}
-    				break;//will this leave the for loop or just the if statement?
-    			}
-    			name += line.charAt(i);
-    		}
-    		score = new String();
-    		name= new String();
-    	}
-		scan.close();
-	}
-	
-	//Clears file that saves top 10 scores
-	private void clearFile() throws IOException {
-		FileWriter file = new FileWriter(filename, true);
-		PrintWriter in = new PrintWriter(file);
-		in.print("");
-		in.close();
+		int i;//holds each character from file
+		
+		while((i = fr.read()) != -1) {
+			//checks for whitespace between name and score in file to separate name and score
+			if(Character.isWhitespace((char)i) == true) {
+				//reads each digit and adds to score
+				while(Character.isDigit((i = fr.read()))) {
+					score += (char)i;
+				}
+				//only adds name and score if score is not empty and not a whitespace
+				if(score.isEmpty() == false && Character.isWhitespace(score.charAt(0)) == false) {
+					top10scores.add(new Pair<>(name, score));
+				}
+				
+				name = "";
+				score = "";
+			}
+			name += (char)i;
+		}
+		
+		fr.close();
 	}
 }

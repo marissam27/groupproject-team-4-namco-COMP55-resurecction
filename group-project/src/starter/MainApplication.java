@@ -1,6 +1,7 @@
 package starter;
 
 import java.awt.Font;
+import java.io.IOException;
 
 public class MainApplication extends GraphicsApplication {
 	public static final int WINDOW_WIDTH = 800;
